@@ -123,6 +123,7 @@ class CreateAnimal(graphene.Mutation):
   Output = AnimalOutput
 
   @staticmethod
+  @mutation_header_jwt_required
   def mutate(root, info, input=None):
     output = AnimalOutput()
     errors = []
@@ -144,6 +145,7 @@ class UpdateAnimal(graphene.Mutation):
   Output = AnimalOutput
 
   @staticmethod
+  @mutation_header_jwt_required
   def mutate(root, info, id=None, name=None):
     output = AnimalOutput()
     errors = []
@@ -166,6 +168,7 @@ class DeleteAnimal(graphene.Mutation):
   Output = DeleteOutput
 
   @staticmethod
+  @mutation_header_jwt_required
   def mutate(root, info, id):
     output = DeleteOutput()
     animal = db_session.query(AnimalModel).filter(AnimalModel.id == id).one()
