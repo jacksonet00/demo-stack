@@ -1,19 +1,13 @@
-from sqlalchemy import create_engine, text, Integer, String, Column, MetaData
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy import create_engine, text, Integer, String, Column, MetaData, ForeignKey
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+import os
 
-engine = create_engine('postgresql://jackson:password@localhost:5431/demo_stack')
+engine = create_engine(os.environ.get('DATABASE_URL'))
 Session = sessionmaker()
 Session.configure(bind=engine)
 
 db_session = Session()
 Base = declarative_base()
-
-engine.execute('''
-CREATE TABLE IF NOT EXISTS animal (
-  id SERIAL PRIMARY KEY,
-  name TEXT
-);
-''')
 class Animal(Base):
   __tablename__ = 'animal'
 
@@ -22,3 +16,11 @@ class Animal(Base):
 
   def __repr__(self):
     return "<Animal(name='%s')>" % (self.name)
+
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+
+Base.metadata.create_all(engine)
