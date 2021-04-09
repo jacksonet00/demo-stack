@@ -1,4 +1,5 @@
 import graphene
+from model import db_session, Animal as AnimalModel
 
 class Animal(graphene.ObjectType):
   id = graphene.Int()
@@ -36,7 +37,10 @@ class CreateAnimal(graphene.Mutation):
     if len(input.name) < 3:
       output.errors.append(InputError(field='name', message='must be at least 3 characters'))
     if not output.errors:
-      output.animal = Animal(id=1, name=input.name)
+      animal = AnimalModel(name=input.name)
+      db_session.add(animal)
+      db_session.commit()
+      output.animal = animal
     return output
 
 class UpdateAnimal(graphene.Mutation):
@@ -50,13 +54,17 @@ class UpdateAnimal(graphene.Mutation):
   def mutate(root, info, id=None, name=None):
     output = AnimalOutput()
     errors = []
+
     if id not in [1, 2]:
       errors.append(InputError(field='id', message='not found'))
     if len(name) < 3:
       errors.append(InputError(field='name', message='must be at least 3 characters'))
     output.errors = errors
     if not errors:
-      output.animal = Animal(id=id, name=name)
+      animal = db_session.query(AnimalModel).filter(AnimalModel.id == id).one()
+      animal.name = name
+      db_session.commit()
+      output.animal = animal
     return output
 
 class DeleteAnimal(graphene.Mutation):
@@ -68,24 +76,28 @@ class DeleteAnimal(graphene.Mutation):
   @staticmethod
   def mutate(root, info, id):
     output = DeleteOutput()
-    if id not in [1, 2]:
+    animal = db_session.query(AnimalModel).filter(AnimalModel.id == id).one()
+    if not animal:
       output.errors.append(InputError(field='id', message='not found'))
     if not output.errors:
-      output.completed = True
+      try:
+        db_session.delete(animal)
+        db_session.commit()
+        output.completed = True
+      except e:
+        print(e)
     return output
 
 class Query(graphene.ObjectType):
-  animal = graphene.Field(Animal)
-  all_animals = graphene.List(Animal)
+  animal = graphene.Field(Animal, id=graphene.Int(required=True))
+  @staticmethod
+  def resolve_animal(parent, info, id):
+    return db_session.query(AnimalModel).filter(AnimalModel.id == id).one()
 
+  all_animals = graphene.List(Animal)
   @staticmethod
   def resolve_all_animals(parent, info):
-    return [Animal(id=1, name='tiger'), Animal(id=2, name='lion')]
-
-  @staticmethod
-  def resolve_animal(parent, info):
-    a = Animal(id=1, name='tiger')
-    return a
+    return db_session.query(AnimalModel).all()
 
 class Mutation(graphene.ObjectType):
   create_animal = CreateAnimal.Field()

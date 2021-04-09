@@ -6,11 +6,14 @@ Build a GraphQL API using a PostgresSQL database, making queries via SQL Alchemy
 
 ## Build API
 
-- Define model in SQL Alchemy with Postgres configuration
-- Split out local Postgres settings so that I can easily switch between prod and dev
 - Define schema and resolvers in Graphene
 - Build Flask server with /graphql endpoint
+- Define model in SQL Alchemy with Postgres configuration
+- Connect model to Graphene schema and resolvers
+- Split out local Postgres settings so that I can easily switch between prod and dev
 
 ### Log
 
 - I've gotten a flask server running a graphql endpoint. On that server I've build out all the crud operations using graphene. I have a single Animal type which I can run the crud ops on. Now I'm going to move from returning constant values from these to returning data from my database. I'll need to implement data loader as well.
+
+- I set up a local postgres database and connected up my crud ops to the db so now I'm not returning any static data. Next thing to do is split out the settings into environment variables so I can easily switch between prod and dev.
