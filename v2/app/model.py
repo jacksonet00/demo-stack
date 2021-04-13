@@ -2,25 +2,30 @@ from sqlalchemy import create_engine, text, Integer, String, Column, MetaData, F
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import os
 
-engine = create_engine(os.environ.get('DATABASE_URL'))
+engine = create_engine(
+    'postgresql://jackson:password@localhost:5431/demo_stack')
 Session = sessionmaker()
 Session.configure(bind=engine)
 
 db_session = Session()
 Base = declarative_base()
+
+
 class Animal(Base):
-  __tablename__ = 'animal'
+    __tablename__ = 'animal'
 
-  id = Column(Integer, primary_key=True)
-  name = Column(String)
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
 
-  def __repr__(self):
-    return "<Animal(name='%s')>" % (self.name)
+    def __repr__(self):
+        return "<Animal(name='%s')>" % (self.name)
+
 
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
+
 
 Base.metadata.create_all(engine)

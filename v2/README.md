@@ -29,3 +29,15 @@ Build a GraphQL API using a PostgresSQL database, making queries via SQL Alchemy
 - I've gotten authentication working for a basic user class and a store object which I can protect with JWT auth using either parameters or headers. Now I just need to add these protections to animals and then get rid of the store.
 
 - I created a login, register, and refresh mutation so that users can create accounts and get tokens.
+
+- Now you must have a valid auth token to modify animal data, but it is publically viewable. I'm willing to say this is good enough auth for now.
+
+## Containerize Sever
+
+- Docker
+
+### Log
+
+- I found an article that reccomends an Application Factory pattern for the Flask server, so I'm going to implement that refactor. This pattern is specifically supposed to help with containerization. This is because we can generate the application and run it by running a python file which means it will be easy to add a start script for our Docker image.
+
+- Trying to split out code into multiple files is insanely annoying in Python. Either that or it's just been so long since I learned it in Javascript that something which is complex in all languages seems simple to me only in  the ones I know. Wow what a moment of enlightenment right there lol. Well hopefully I can find some better resources on this.
