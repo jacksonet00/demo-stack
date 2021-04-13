@@ -52,10 +52,10 @@ class Register(graphene.Mutation):
                 field='username', message='already taken'))
         if len(input.username) < 3:
             errors.append(InputError(field='username',
-                          message='must be at least 3 characters'))
+                                     message='must be at least 3 characters'))
         if len(input.password) < 3:
             errors.append(InputError(field='password',
-                          message='must be at least 3 characters'))
+                                     message='must be at least 3 characters'))
         output.errors = errors
         if not errors:
             hashed_password = pbkdf2_sha256.hash(input.password)
@@ -79,7 +79,7 @@ class Login(graphene.Mutation):
         errors = []
         if not user:
             errors.append(InputError(field='username',
-                          message='does not exist'))
+                                     message='does not exist'))
         if user and not pbkdf2_sha256.verify(input.password, user.password):
             errors.append(InputError(field='password', message='incorrect'))
         output.errors = errors
