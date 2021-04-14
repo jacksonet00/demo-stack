@@ -11,4 +11,4 @@ COPY . /usr/src/app
 # Expose port so that it's accessible to external connections
 EXPOSE 5000
 # Run the Flask application
-CMD ["python", "manage.py", "runserver"]
+CMD ["python", "manage.py"]
