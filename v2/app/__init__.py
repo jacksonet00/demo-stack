@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, redirect
 from flask_graphql import GraphQLView
 from flask_graphql_auth import GraphQLAuth
 from .schema import Schema
@@ -18,6 +18,11 @@ def create_app():
     GraphQLAuth(app)
 
     Base.metadata.create_all(engine)
+
+    # pylint: disable=unused-variable
+    @app.route('/')
+    def index():
+        return redirect('/graphql')
 
     app.add_url_rule(
         '/graphql',
