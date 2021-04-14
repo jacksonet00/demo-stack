@@ -3,15 +3,8 @@ from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import os
 from time import sleep
 
-retries = 5
-while retries > 0:
-    try:
-        engine = create_engine(
-            'postgresql://postgres:postgres@db:5432/demo-stack')
-    except Exception:
-        print(Exception)
-        sleep(5)
-        print(f'Exception! Retrying... (attempt {retries}')
+engine = create_engine(
+    'postgresql://postgres:postgres@db:5432/demo-stack')
 
 Session = sessionmaker()
 Session.configure(bind=engine)

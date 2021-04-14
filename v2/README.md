@@ -55,3 +55,5 @@
 - Before trying to throw my project up on Heroku, I'm spending my time figuring out Docker a bit more and understanding the right way to contain this thing. Once I understand Docker it will be much easier to follow deploy instructions.
 
 - I think what I need to do is create a Dockerfile for both the database and the app. Then create a local.yml and production.yml for docker-compose to use. Inside of these there will be build scripts which point to the respective Dockerfile for both the server and database services. Reference github-leaderboard for a good example.
+
+- I have docker setup very nicely now. Should be easy to deploy. I'll do that tomorrow, I've already stayed up til 1. I got lost in the code...
