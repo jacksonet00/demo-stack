@@ -1,1 +1,1 @@
-heroku container:push --app demo-stack server && heroku container:release --app demo-stack server
+docker build -t jacksonet00/demo-stack:latest . && heroku container:push --app demo-stack web && heroku container:release --app demo-stack web

@@ -59,3 +59,9 @@
 - I have docker setup very nicely now. Should be easy to deploy. I'll do that tomorrow, I've already stayed up til 1. I got lost in the code...
 
 - I now understand the right strat for deploying. I have everything setup, but I'm still getting some bugs when deploying. I went ahead and moved everything into environment variables and created start, stop, debug, and deploy scripts.
+
+- The app is now deployed on Heroku. It could use a bit of cleanup to reduce env vars and what not, but for now it is functional.
+
+## Add Relations
+
+### Log

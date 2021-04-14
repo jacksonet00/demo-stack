@@ -3,7 +3,8 @@ import os
 from sqlalchemy import create_engine, text, Integer, String, Column, MetaData, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
-engine = create_engine(os.environ['DATABASE_URL'])
+engine = create_engine(os.environ['DATABASE_URL'].replace(
+    'postgres://', 'postgresql://', 1))
 
 Session = sessionmaker()
 Session.configure(bind=engine)
