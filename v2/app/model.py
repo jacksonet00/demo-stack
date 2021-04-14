@@ -1,10 +1,16 @@
+import os
+# from time import sleep
 from sqlalchemy import create_engine, text, Integer, String, Column, MetaData, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
-import os
-from time import sleep
+
+username = os.environ['POSTGRES_USER']
+password = os.environ['POSTGRES_PASSWORD']
+container_name = os.environ['DB_CONTINAER']
+port = os.environ['DB_PORT']
+db_name = os.environ['POSTGRES_DB']
 
 engine = create_engine(
-    'postgresql://postgres:postgres@db:5432/demo-stack')
+    f'postgresql://{username}:{password}@{container_name}:{port}/{db_name}')
 
 Session = sessionmaker()
 Session.configure(bind=engine)

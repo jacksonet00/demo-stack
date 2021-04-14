@@ -16,3 +16,17 @@ services:
       - db
     ports:
       - '5000:5000'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: demo-stack
+      FLASK_DEBUG: 'True'
+      FLASK_ENV: development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: demo-stack
+      DB_CONTINAER: db
+      DB_PORT: 5432
+      DB_HOST: 0.0.0.0
+      SECRET_KEY: asdftyuiopasdf
+      JWT_SECRET_KEY: lkjhasdfyuop
