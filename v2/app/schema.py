@@ -1,13 +1,9 @@
 from passlib.hash import pbkdf2_sha256
 from flask_graphql_auth import (
-    AuthInfoField,
-    GraphQLAuth,
     get_jwt_identity,
     create_access_token,
     create_refresh_token,
-    query_header_jwt_required,
     mutation_jwt_refresh_token_required,
-    mutation_jwt_required,
     mutation_header_jwt_required
 )
 from .model import db_session, Animal as AnimalModel, User as UserModel
@@ -20,7 +16,7 @@ class User(graphene.ObjectType):
     password = graphene.String()
 
 
-class InputError(graphene.ObjectType):
+class FieldError(graphene.ObjectType):
     field = graphene.String()
     message = graphene.String()
 
@@ -32,7 +28,7 @@ class UserInput(graphene.InputObjectType):
 
 class AuthOutput(graphene.ObjectType):
     user = graphene.Field(User, default_value=None)
-    errors = graphene.List(InputError, default_value=[])
+    errors = graphene.List(FieldError, default_value=[])
     access_token = graphene.String(default_value='')
     refresh_token = graphene.String(default_value='')
 
@@ -50,13 +46,13 @@ class Register(graphene.Mutation):
         user = db_session.query(UserModel).filter(
             UserModel.username == input.username).first()
         if user:
-            errors.append(InputError(
+            errors.append(FieldError(
                 field='username', message='already taken'))
         if len(input.username) < 3:
-            errors.append(InputError(field='username',
+            errors.append(FieldError(field='username',
                                      message='must be at least 3 characters'))
         if len(input.password) < 3:
-            errors.append(InputError(field='password',
+            errors.append(FieldError(field='password',
                                      message='must be at least 3 characters'))
         output.errors = errors
         if not errors:
@@ -84,10 +80,10 @@ class Login(graphene.Mutation):
         user = db_session.query(UserModel).filter(
             UserModel.username == input.username).first()
         if not user:
-            errors.append(InputError(field='username',
+            errors.append(FieldError(field='username',
                                      message='does not exist'))
         if user and not pbkdf2_sha256.verify(input.password, user.password):
-            errors.append(InputError(field='password', message='incorrect'))
+            errors.append(FieldError(field='password', message='incorrect'))
         output.errors = errors
         if not errors:
             output.user = user
@@ -128,12 +124,21 @@ class AnimalInput(graphene.InputObjectType):
 
 class AnimalOutput(graphene.ObjectType):
     animal = graphene.Field(Animal, default_value=None)
-    errors = graphene.List(InputError, default_value=[])
+    errors = graphene.List(FieldError, default_value=[])
 
 
 class DeleteOutput(graphene.ObjectType):
     completed = graphene.Boolean(default_value=False)
-    errors = graphene.List(InputError, default_value=[])
+    errors = graphene.List(FieldError, default_value=[])
+
+
+def handle_authorization_error(func):
+    def inner_function(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except:
+            return AnimalOutput(errors=[FieldError(field='Authorization Header', message='invalid token')])
+    return inner_function
 
 
 class CreateAnimal(graphene.Mutation):
@@ -142,20 +147,21 @@ class CreateAnimal(graphene.Mutation):
 
     Output = AnimalOutput
 
-    @staticmethod
-    @mutation_header_jwt_required
+    @ staticmethod
+    @ handle_authorization_error
+    @ mutation_header_jwt_required
     def mutate(root, info, input=None):
         output = AnimalOutput()
         errors = []
         if len(input.name) < 3:
-            errors.append(InputError(
+            errors.append(FieldError(
                 field='name', message='must be at least 3 characters'))
-        output.errors = errors
         if not errors:
             animal = AnimalModel(name=input.name)
             db_session.add(animal)
             db_session.commit()
             output.animal = animal
+        output.errors = errors
         return output
 
 
@@ -166,17 +172,18 @@ class UpdateAnimal(graphene.Mutation):
 
     Output = AnimalOutput
 
-    @staticmethod
-    @mutation_header_jwt_required
+    @ staticmethod
+    @handle_authorization_error
+    @ mutation_header_jwt_required
     def mutate(root, info, id=None, name=None):
         output = AnimalOutput()
         errors = []
         animal = db_session.query(
             AnimalModel).filter(AnimalModel.id == id).one()
         if not animal:
-            errors.append(InputError(field='id', message='not found'))
+            errors.append(FieldError(field='id', message='not found'))
         if len(name) < 3:
-            errors.append(InputError(
+            errors.append(FieldError(
                 field='name', message='must be at least 3 characters'))
         output.errors = errors
         if not errors:
@@ -192,14 +199,15 @@ class DeleteAnimal(graphene.Mutation):
 
     Output = DeleteOutput
 
-    @staticmethod
-    @mutation_header_jwt_required
+    @ staticmethod
+    @handle_authorization_error
+    @ mutation_header_jwt_required
     def mutate(root, info, id):
         output = DeleteOutput()
         animal = db_session.query(
             AnimalModel).filter(AnimalModel.id == id).one()
         if not animal:
-            output.errors.append(InputError(field='id', message='not found'))
+            output.errors.append(FieldError(field='id', message='not found'))
         if not output.errors:
             try:
                 db_session.delete(animal)
@@ -213,19 +221,19 @@ class DeleteAnimal(graphene.Mutation):
 class Query(graphene.ObjectType):
     animal = graphene.Field(Animal, id=graphene.Int(required=True))
 
-    @staticmethod
+    @ staticmethod
     def resolve_animal(parent, info, id):
         return db_session.query(AnimalModel).filter(AnimalModel.id == id).one()
 
     all_animals = graphene.List(Animal)
 
-    @staticmethod
+    @ staticmethod
     def resolve_all_animals(parent, info):
         return db_session.query(AnimalModel).all()
 
     all_users = graphene.Field(User)
 
-    @staticmethod
+    @ staticmethod
     def resolve_all_users(parent, info):
         return db_session.query(UserModel).all()
 
