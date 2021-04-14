@@ -3,6 +3,7 @@ from flask_graphql import GraphQLView
 import os
 from flask_graphql_auth import GraphQLAuth
 from .schema import Schema
+from .model import engine, Base
 
 
 def create_app():
@@ -16,6 +17,8 @@ def create_app():
     # JWT_REFRESH_TOKEN_EXPIRES default = 30 days
 
     auth = GraphQLAuth(app)
+
+    Base.metadata.create_all(engine)
 
     app.add_url_rule(
         '/graphql',

@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import os
 
 engine = create_engine(
-    'postgresql://jackson:password@localhost:5431/demo_stack')
+    'postgresql://jackson:password@database:5432/demo_stack')
 Session = sessionmaker()
 Session.configure(bind=engine)
 
@@ -26,6 +26,3 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-
-
-Base.metadata.create_all(engine)

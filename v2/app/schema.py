@@ -47,6 +47,8 @@ class Register(graphene.Mutation):
     def mutate(root, info, input):
         output = AuthOutput()
         errors = []
+        user = db_session.query(UserModel).filter(
+            UserModel.username == input.username).first()
         if user:
             errors.append(InputError(
                 field='username', message='already taken'))
@@ -59,6 +61,8 @@ class Register(graphene.Mutation):
         output.errors = errors
         if not errors:
             hashed_password = pbkdf2_sha256.hash(input.password)
+            new_user = UserModel(username=input.username,
+                                 password=hashed_password)
             db_session.add(new_user)
             db_session.commit()
             output.user = new_user
@@ -77,6 +81,8 @@ class Login(graphene.Mutation):
     def mutate(root, info, input):
         output = AuthOutput()
         errors = []
+        user = db_session.query(UserModel).filter(
+            UserModel.username == input.username).first()
         if not user:
             errors.append(InputError(field='username',
                                      message='does not exist'))
@@ -199,7 +205,7 @@ class DeleteAnimal(graphene.Mutation):
                 db_session.delete(animal)
                 db_session.commit()
                 output.completed = True
-            except e:
+            except:
                 pass
         return output
 

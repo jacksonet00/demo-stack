@@ -1,0 +1,25 @@
+version: '3'
+services:
+  server:
+    container_name: flask
+    build: .
+    ports: ['5000:5000']
+    volumes: ['.:/usr/src/app']
+    restart: always
+    environment:
+      ENV: development
+    links:
+      - database
+
+  database:
+    container_name: database
+    image: postgres:13
+    volumes:
+      - flask-db:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=jackson
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=demo_stack
+
+volumes:
+  flask-db:
