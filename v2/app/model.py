@@ -3,14 +3,7 @@ import os
 from sqlalchemy import create_engine, text, Integer, String, Column, MetaData, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
-username = os.environ['POSTGRES_USER']
-password = os.environ['POSTGRES_PASSWORD']
-container_name = os.environ['DB_CONTINAER']
-port = os.environ['DB_PORT']
-db_name = os.environ['POSTGRES_DB']
-
-engine = create_engine(
-    f'postgresql://{username}:{password}@{container_name}:{port}/{db_name}')
+engine = create_engine(os.environ['DATABASE_URL'])
 
 Session = sessionmaker()
 Session.configure(bind=engine)

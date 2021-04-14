@@ -1,0 +1,1 @@
+heroku container:push --app demo-stack server && heroku container:release --app demo-stack server
