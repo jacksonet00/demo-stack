@@ -3,8 +3,10 @@ services:
   server:
     container_name: flask
     build: .
-    ports: ['5000:5000']
-    volumes: ['.:/usr/src/app']
+    ports:
+      - '5000:5000'
+    volumes:
+      - '.:/usr/src/app'
     restart: always
     environment:
       ENV: development
@@ -14,6 +16,8 @@ services:
   database:
     container_name: database
     image: postgres:13
+    ports:
+      - '5432:5432'
     volumes:
       - flask-db:/var/lib/postgresql/data/
     environment:
