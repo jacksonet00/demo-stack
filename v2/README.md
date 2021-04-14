@@ -2,7 +2,7 @@
 
 ## Goal
 
-(1) Build a GraphQL API in Python. (2) Privatize the API so that queries are protected with an authorization token which are granted to API users. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Scale via serverless.
+(1) Build a GraphQL API in Python. (2) Privatize the API so that queries are protected with an authorization token which are granted to API users. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Scale via serverless. (8) Add documentation.
 
 ## Build API
 
@@ -63,5 +63,31 @@
 - The app is now deployed on Heroku. It could use a bit of cleanup to reduce env vars and what not, but for now it is functional.
 
 ## Add Relations
+
+- Modify SQL Alchmey Model
+- Create new structure. Users own zoos and animals. Zoos contain animals.
+- Modify Graphene Schema
+- Deploy
+
+### Log
+
+## Handle Image Uploads
+
+- Add profile photo to User
+
+### Log
+
+## Refactor Application
+
+- Package for GraphQL app
+- Package for Dockerized Flask server
+- Package for serverless Flask server
+
+### Log
+
+## Scale with Serverless
+
+- Convert to serverless database
+- Convert to serverless Flask graphql endpoint
 
 ### Log
