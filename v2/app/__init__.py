@@ -3,7 +3,7 @@ from flask import Flask, redirect
 from flask_graphql import GraphQLView
 from flask_graphql_auth import GraphQLAuth
 from .schema import Schema
-from .model import engine, Base
+from .engine import engine, Base
 
 
 def create_app():

@@ -64,30 +64,48 @@
 
 ## Add Relations
 
-- Modify SQL Alchmey Model
-- Create new structure. Users own zoos and animals. Zoos contain animals.
-- Modify Graphene Schema
-- Deploy
+**Refactor app:**
+
+- manage.py
+- app (3. intializes base class)
+  - schema.py (2. imports resolvers)
+  - engine.py (1. base class passed to models)
+  - data
+    - user
+      - model.py
+      - resolver.py
+    - zoo
+      - model.py
+      - resolver.py
+    - animal
+      - model.py
+      - resolver.py
+    - types
+
+**New Model:**
+
+- User(username: text, password: text)
+
+  - id: Int
+  - username: String
+  - zoos: [Zoo]
+  - animals: [Animal]
+
+- Zoo(name: text, owner_id: int)
+
+  - id: Int
+  - name: String
+  - ownerId: Int
+  - owner: User
+  - animals: [Animal]
+
+- Animal(name: text, owner_id: int, zoo_id: nullable int)
+  - id: Int
+  - ownerId: Int
+  - owner: User
+  - zooId: Int?
+  - zoo: Zoo?
 
 ### Log
 
-## Handle Image Uploads
-
-- Add profile photo to User
-
-### Log
-
-## Refactor Application
-
-- Package for GraphQL app
-- Package for Dockerized Flask server
-- Package for serverless Flask server
-
-### Log
-
-## Scale with Serverless
-
-- Convert to serverless database
-- Convert to serverless Flask graphql endpoint
-
-### Log
+- I'm honestly so happy with how this has been going so far. Never would have expected it to be this smooth. And when I run into issues I'm actually investing the time to fully understand the problem so that I learn more about configuring the stack.
