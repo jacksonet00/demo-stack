@@ -109,3 +109,60 @@
 ### Log
 
 - I'm honestly so happy with how this has been going so far. Never would have expected it to be this smooth. And when I run into issues I'm actually investing the time to fully understand the problem so that I learn more about configuring the stack.
+
+- Refactor is looking really, really clean. Still a couple bugs, stuck on this one right now:
+
+  ```
+  Traceback (most recent call last):
+  server_1  |   File "manage.py", line 3, in <module>
+  server_1  |     from app import create_app
+  server_1  |   File "/usr/src/app/app/__init__.py", line 5, in <module>
+  server_1  |     from .schema import Schema
+  server_1  |   File "/usr/src/app/app/schema.py", line 47, in <module>
+  server_1  |     Schema = graphene.Schema(query=Query, mutation=Mutation)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/schema.py", line 78, in __init__
+  server_1  |     self.build_typemap()
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/schema.py", line 167, in build_typemap
+  server_1  |     self._type_map = TypeMap(
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/typemap.py", line 80, in __init__
+  server_1  |     super(TypeMap, self).__init__(types)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphql/type/typemap.py", line 31, in __init__
+  server_1  |     self.update(reduce(self.reducer, types, OrderedDict()))  # type: ignore
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/typemap.py", line 88, in reducer
+  server_1  |     return self.graphene_reducer(map, type)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/typemap.py", line 117, in graphene_reducer
+  server_1  |     return GraphQLTypeMap.reducer(map, internal_type)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphql/type/typemap.py", line 109, in reducer
+  server_1  |     field_map = type_.fields
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphql/pyutils/cached_property.py", line 22, in __get__
+  server_1  |     value = obj.__dict__[self.func.__name__] = self.func(obj)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphql/type/definition.py", line 198, in fields
+  server_1  |     return define_field_map(self, self._fields)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphql/type/definition.py", line 212, in define_field_map
+  server_1  |     field_map = field_map()
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/typemap.py", line 275, in construct_fields_for_type
+  server_1  |     map = self.reducer(map, field.type)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/typemap.py", line 88, in reducer
+  server_1  |     return self.graphene_reducer(map, type)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/typemap.py", line 93, in graphene_reducer
+  server_1  |     return self.reducer(map, type.of_type)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/typemap.py", line 88, in reducer
+  server_1  |     return self.graphene_reducer(map, type)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/typemap.py", line 117, in graphene_reducer
+  server_1  |     return GraphQLTypeMap.reducer(map, internal_type)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphql/type/typemap.py", line 109, in reducer
+  server_1  |     field_map = type_.fields
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphql/pyutils/cached_property.py", line 22, in __get__
+  server_1  |     value = obj.__dict__[self.func.__name__] = self.func(obj)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphql/type/definition.py", line 198, in fields
+  server_1  |     return define_field_map(self, self._fields)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphql/type/definition.py", line 212, in define_field_map
+  server_1  |     field_map = field_map()
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/typemap.py", line 275, in construct_fields_for_type
+  server_1  |     map = self.reducer(map, field.type)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphene/types/typemap.py", line 89, in reducer
+  server_1  |     return GraphQLTypeMap.reducer(map, type)
+  server_1  |   File "/usr/local/lib/python3.8/site-packages/graphql/type/typemap.py", line 87, in reducer
+  server_1  |     if type_.name in map_:
+  server_1  | AttributeError: module 'app.api.user' has no attribute 'name'
+  ```
