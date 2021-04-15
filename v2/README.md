@@ -161,3 +161,4 @@
   server_1  |     if type_.name in map_:
   server_1  | AttributeError: module 'app.api.user' has no attribute 'name'
   ```
+- At some point I want to look at using the `SQLAlchemyObjectType` rather than passing around the `db_session`. It looks like it could make things cleaner. My current thought is something like, if this can fully replace `db_session` I will implement it, otherwise I'll keep my current setup. It's just most important to me that I interact with the database in the same way consistently.
