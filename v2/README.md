@@ -2,7 +2,7 @@
 
 ## Goal
 
-(1) Build a GraphQL API in Python. (2) Privatize the API so that queries are protected with an authorization token which are granted to API users. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Scale via serverless. (8) Add documentation.
+(1) Build a GraphQL API in Python. (2) Privatize the API so that queries are protected with an authorization token which are granted to API users. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Scale via Kubernetes. (8) Scale via serverless. (9) Add documentation.
 
 ## Build API
 
@@ -66,20 +66,15 @@
 
 **Refactor app:**
 
-- manage.py
-- app (3. intializes base class)
-  - schema.py (2. imports resolvers)
-  - engine.py (1. base class passed to models)
-  - data
+- manage
+- app
+  - schema
+  - engine
+  - tools
+  - api
     - user
-      - model.py
-      - resolver.py
     - zoo
-      - model.py
-      - resolver.py
     - animal
-      - model.py
-      - resolver.py
     - types
 
 **New Model:**
