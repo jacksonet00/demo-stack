@@ -9,8 +9,11 @@ from .engine import engine, Base
 def create_app():
     app = Flask(__name__)
 
-    app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
-    app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'asdfhasdjhfkja'
+    app.config['JWT_SECRET_KEY'] = os.environ.get(
+        'JWT_SECRET_KEY') or 'ajsdfgaksdbbjknv'
+
+    app.debug = False if os.environ.get('ENV') == '__prod__' else True
 
     # JWT_ACCESS_TOKEN_EXPIRES default = 15 minutes
     # JWT_REFRESH_TOKEN_EXPIRES default = 30 days
