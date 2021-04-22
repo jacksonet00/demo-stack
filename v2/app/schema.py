@@ -170,6 +170,63 @@ class DeleteAnimal(graphene.Mutation):
         return res
 
 
+class MoveAnimal(graphene.Mutation):
+    class Arguments:
+        animal_id = graphene.Int(required=True)
+        zoo_id = graphene.Int(required=True)
+
+    Output = AnimalResponse
+
+    @staticmethod
+    @handle_animal_authorization_error
+    @mutation_header_jwt_required
+    def mutate(root, info, animal_id, zoo_id):
+        res = AnimalResponse()
+        animal = db_session.query(AnimalModel).filter(
+            AnimalModel.id == animal_id).first()
+        zoo = db_session.query(ZooModel).filter(ZooModel.id == zoo_id).first()
+        if not animal:
+            res.errors.append(FieldError(field='animal_id',
+                              message='animal does not exist'))
+        if not zoo:
+            res.errors.append(FieldError(field='zoo_id',
+                              message='zoo does not exist'))
+        if not res.errors:
+            animal.zoo_id = zoo_id
+            db_session.commit()
+            res.animal = animal
+        return res
+
+
+class TransferAnimal(graphene.Mutation):
+    class Arguments:
+        animal_id = graphene.Int(required=True)
+        user_id = graphene.Int(required=True)
+
+    Output = AnimalResponse
+
+    @staticmethod
+    @handle_animal_authorization_error
+    @mutation_header_jwt_required
+    def mutate(root, info, animal_id, user_id):
+        res = AnimalResponse()
+        animal = db_session.query(AnimalModel).filter(
+            AnimalModel.id == animal_id).first()
+        user = db_session.query(UserModel).filter(
+            UserModel.id == user_id).first()
+        if not animal:
+            res.errors.append(FieldError(field='animal_id',
+                              message='animal does not exist'))
+        if not user:
+            res.errors.append(FieldError(field='user_id',
+                              message='user does not exist'))
+        if not res.errors:
+            animal.owner_id = user_id
+            db_session.commit()
+            res.animal = animal
+        return res
+
+
 class CreateZoo(graphene.Mutation):
     class Arguments:
         input = ZooInput(required=True)
@@ -241,6 +298,35 @@ class DeleteZoo(graphene.Mutation):
                 res.completed = True
             except:
                 pass
+        return res
+
+
+class TransferZoo(graphene.Mutation):
+    class Arguments:
+        zoo_id = graphene.Int(required=True)
+        user_id = graphene.Int(required=True)
+
+    Output = ZooResponse
+
+    @staticmethod
+    @handle_zoo_authorization_error
+    @mutation_header_jwt_required
+    def mutate(root, info, zoo_id, user_id):
+        res = ZooResponse()
+        zoo = db_session.query(ZooModel).filter(
+            ZooModel.id == zoo_id).first()
+        user = db_session.query(UserModel).filter(
+            UserModel.id == user_id).first()
+        if not zoo:
+            res.errors.append(FieldError(
+                field='zoo_id', message='zoo does not exist'))
+        if not user:
+            res.errors.append(FieldError(
+                field='user_id', message='user does not exist'))
+        if not res.errors:
+            zoo.owner_id = user_id
+            db_session.commit()
+            res.zoo = zoo
         return res
 
 
@@ -352,10 +438,13 @@ class Mutation(graphene.ObjectType):
     create_zoo = CreateZoo.Field()
     update_zoo = UpdateZoo.Field()
     delete_zoo = DeleteZoo.Field()
+    transfer_zoo = TransferZoo.Field()
 
     create_animal = CreateAnimal.Field()
     update_animal = UpdateAnimal.Field()
     delete_zoo = DeleteAnimal.Field()
+    move_animal = MoveAnimal.Field()
+    transfer_animal = TransferAnimal.Field()
 
 
 Schema = graphene.Schema(query=Query, mutation=Mutation)
