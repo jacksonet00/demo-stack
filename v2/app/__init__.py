@@ -4,6 +4,8 @@ from flask_graphql import GraphQLView
 from flask_graphql_auth import GraphQLAuth
 from .schema import Schema
 from .engine import engine, Base
+import json
+from .db import gen_data, drop_tables
 
 
 def create_app():
@@ -20,12 +22,18 @@ def create_app():
 
     GraphQLAuth(app)
 
+    drop_tables(['animals', 'zoos', 'users'])
+
     Base.metadata.create_all(engine)
+
+    # Generate dummy data for dev environment
+    if os.environ.get('ENV') == '__dev__':
+        gen_data()
 
     # pylint: disable=unused-variable
     @app.route('/')
     def index():
-        return redirect('/graphql')
+        return json.dumps({'message': 'help me! i am trapped making this api!'})
 
     app.add_url_rule(
         '/graphql',
