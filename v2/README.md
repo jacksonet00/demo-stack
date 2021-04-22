@@ -2,7 +2,7 @@
 
 ## Goal
 
-(1) Build a GraphQL API in Python. (2) Privatize the API. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Scale via Kubernetes. (8) Scale via serverless. (9) Add documentation.
+(1) Build a GraphQL API in Python. (2) Privatize the API. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Add pagination. (8) Add dataloader. (9) Scale via Kubernetes. (10) Scale via serverless. (11) Add documentation.
 
 Hosted at: https://demo-stack.herokuapp.com/graphql
 
@@ -100,8 +100,19 @@ Hosted at: https://demo-stack.herokuapp.com/graphql
   - zooId: Int?
   - zoo: Zoo?
 
-- Do refactor with new model
-- Add DataLoader for relations
+**Mutations:**
+
+- User
+  - Register(input: { username: String!, password: String! })
+  - Login(input: { username: String!, password: String! })
+  - Refresh(refreshToken: String!)
+- Animal
+  - CRUD
+  - Move(animalId: Int!, zooId: Int!)
+  - Transfer(animalId: Int!, userId: Int!)
+- Zoo
+  - CRUD
+  - Transfer(zooId: Int!, userId: Int!)
 
 ### Log
 
