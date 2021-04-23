@@ -11,14 +11,14 @@ from .db import gen_data, drop_tables
 def create_app():
     app = Flask(__name__)
 
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'asdfhasdjhfkja'
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdfhasdjhfkja')
     app.config['JWT_SECRET_KEY'] = os.environ.get(
-        'JWT_SECRET_KEY') or 'ajsdfgaksdbbjknv'
-
-    app.debug = False if os.environ.get('ENV') == '__prod__' else True
+        'JWT_SECRET_KEY', 'ajsdfgaksdbbjknv')
 
     # JWT_ACCESS_TOKEN_EXPIRES default = 15 minutes
     # JWT_REFRESH_TOKEN_EXPIRES default = 30 days
+
+    app.debug = os.environ.get('ENV') != '__prod__'
 
     GraphQLAuth(app)
 
