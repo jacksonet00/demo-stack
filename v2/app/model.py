@@ -1,13 +1,14 @@
 from .engine import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 
 
 class BaseModel:
     id = Column(Integer, primary_key=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_at = Column(DateTime(timezone=True),
+                        server_default=func.now(), onupdate=func.now())
 
 
 class User(Base, BaseModel):
@@ -17,6 +18,10 @@ class User(Base, BaseModel):
     password = Column(String, nullable=False)
     zoos = relationship('Zoo', back_populates='owner')
     animals = relationship('Animal', back_populates='owner')
+
+    @validates('username')
+    def convert_lowercase(self, key, value):
+        return value.lower()
 
 
 class Animal(Base, BaseModel):
