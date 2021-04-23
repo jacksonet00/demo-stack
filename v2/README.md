@@ -117,3 +117,5 @@ Hosted at: https://demo-stack.herokuapp.com/graphql
 ### Log
 
 - I'm honestly so happy with how this has been going so far. Never would have expected it to be this smooth. And when I run into issues I'm actually investing the time to fully understand the problem so that I learn more about configuring the stack.
+
+- I've got the new schema setup and the new mutations added. Before moving on to image uploads I'm going to try to get the user mutations working a little better. I want to have a full auth setup where you create an account, confirm an email or phone number, login, and then the app can detect who you are based off of your access token.
