@@ -1,6 +1,7 @@
 import os
 from flask import Flask, redirect
-from flask_graphql import GraphQLView
+# from flask_graphql import GraphQLView
+from graphene_file_upload.flask import FileUploadGraphQLView
 from flask_graphql_auth import GraphQLAuth
 from .schema import Schema
 from .engine import engine, Base
@@ -37,7 +38,7 @@ def create_app():
 
     app.add_url_rule(
         '/graphql',
-        view_func=GraphQLView.as_view(
+        view_func=FileUploadGraphQLView.as_view(
             'graphql',
             schema=Schema,
             graphiql=True,

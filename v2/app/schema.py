@@ -6,6 +6,19 @@ from .engine import db_session
 from .model import Animal as AnimalModel, Zoo as ZooModel, User as UserModel
 from promise import Promise
 from promise.dataloader import DataLoader
+from graphene_file_upload.scalars import Upload
+import os
+
+
+class UploadMutation(graphene.Mutation):
+    class Arguments:
+        file = Upload(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, file, **kwargs):
+        file.save(os.path.join('images', file.filename))
+        return UploadMutation(success=True)
 
 
 def handle_animal_authorization_error(func):
@@ -452,6 +465,8 @@ class Mutation(graphene.ObjectType):
     delete_animal = DeleteAnimal.Field()
     move_animal = MoveAnimal.Field()
     transfer_animal = TransferAnimal.Field()
+
+    upload_file = UploadMutation.Field()
 
 
 Schema = graphene.Schema(query=Query, mutation=Mutation)
