@@ -2,7 +2,7 @@
 
 ## Goal
 
-(1) Build a GraphQL API in Python. (2) Privatize the API. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Add pagination. (8) Add dataloader. (9) Scale via Kubernetes. (10) Scale via serverless. (11) Add documentation.
+(1) Build a GraphQL API in Python. (2) Privatize the API. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Add pagination. (8) Add dataloader. (9) Scale via Kubernetes. (10) Scale via serverless. (11) Add documentation. (12) Rate limiting. (13) DDoS protection. (14) Add tests.
 
 Hosted at: https://demo-stack.herokuapp.com/graphql
 
@@ -119,3 +119,26 @@ Hosted at: https://demo-stack.herokuapp.com/graphql
 - I'm honestly so happy with how this has been going so far. Never would have expected it to be this smooth. And when I run into issues I'm actually investing the time to fully understand the problem so that I learn more about configuring the stack.
 
 - I've got the new schema setup and the new mutations added. Before moving on to image uploads I'm going to try to get the user mutations working a little better. I want to have a full auth setup where you create an account, confirm an email or phone number, login, and then the app can detect who you are based off of your access token.
+
+- Everything seems to be working, didn't get around to improving the auth system. I'll probably get image uploads, pagination, and dataloader working first. Then I'll improve the auth before moving on to the deploy system. At that same time I'll probably refactor to use `SQLAlchemyObjectType` and `relay`.
+
+## Handle Image Uploads
+
+- graphene-file-upload
+- Google Cloud Storage
+
+**Steps**
+
+1. Implement graphene-file-upload
+2. Upload files via postman to local folder
+3. Swap out local folder for GCP bucket using google-cloud-storage
+4. Configure bucket permissions
+5. Add profile images to User
+
+**Stretch**
+
+6. Layer imigix in front of GCP for resizing
+
+### Log
+
+- Currently I've implemented the graphene-file-upload library and I have a local images folder which I can push files to through graphql. Next step is to clean up this system a bit and then switch out the local folder for a GCP bucket.
