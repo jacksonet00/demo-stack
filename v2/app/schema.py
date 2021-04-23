@@ -42,6 +42,8 @@ class Animal(graphene.ObjectType):
     owner = graphene.Field(lambda: User)
     zoo_id = graphene.Int(required=False)
     zoo = graphene.Field(lambda: Zoo, required=False)
+    created_at = graphene.DateTime()
+    updated_at = graphene.DateTime()
 
     @staticmethod
     def resolve_owner(parent, info):
@@ -63,6 +65,8 @@ class Zoo(graphene.ObjectType):
     owner_id = graphene.Int()
     owner = graphene.Field(lambda: User)
     animals = graphene.List(Animal)
+    created_at = graphene.DateTime()
+    updated_at = graphene.DateTime()
 
     @staticmethod
     def resolve_owner(parent, info):
@@ -79,6 +83,8 @@ class User(graphene.ObjectType):
     username = graphene.String()
     zoos = graphene.List(Zoo)
     animals = graphene.List(Animal)
+    created_at = graphene.DateTime()
+    updated_at = graphene.DateTime()
 
 
 class AuthResponse(graphene.ObjectType):
@@ -339,14 +345,14 @@ class Register(graphene.Mutation):
     @staticmethod
     def mutate(root, info, input):
         res = AuthResponse()
-
+        username = input.username.lower()
         user = db_session.query(UserModel).filter(
             UserModel.username == input.username).first()
 
         if user:
             res.errors.append(FieldError(
                 field='username', message='already taken'))
-        if len(input.username) < 3:
+        if len(username) < 3:
             res.errors.append(FieldError(field='username',
                                          message='must be at least 3 characters'))
         if len(input.password) < 3:
@@ -354,13 +360,13 @@ class Register(graphene.Mutation):
                                          message='must be at least 3 characters'))
         if not res.errors:
             hashed_password = pbkdf2_sha256.hash(input.password)
-            user = UserModel(username=input.username,
+            user = UserModel(username=username,
                              password=hashed_password)
             db_session.add(user)
             db_session.commit()
             res.user = user
-            res.access_token = create_access_token(input.username)
-            res.refresh_token = create_refresh_token(input.username)
+            res.access_token = create_access_token(username)
+            res.refresh_token = create_refresh_token(username)
         return res
 
 
@@ -373,8 +379,9 @@ class Login(graphene.Mutation):
     @staticmethod
     def mutate(root, info, input):
         res = AuthResponse()
+        username = input.username.lower()
         user = db_session.query(UserModel).filter(
-            UserModel.username == input.username).first()
+            UserModel.username == username).first()
         if not user:
             res.errors.append(FieldError(field='username',
                                          message='does not exist'))
@@ -383,8 +390,8 @@ class Login(graphene.Mutation):
                 field='password', message='incorrect'))
         if not res.errors:
             res.user = user
-            res.access_token = create_access_token(input.username)
-            res.refresh_token = create_refresh_token(input.username)
+            res.access_token = create_access_token(username)
+            res.refresh_token = create_refresh_token(username)
         return res
 
 
@@ -442,7 +449,7 @@ class Mutation(graphene.ObjectType):
 
     create_animal = CreateAnimal.Field()
     update_animal = UpdateAnimal.Field()
-    delete_zoo = DeleteAnimal.Field()
+    delete_animal = DeleteAnimal.Field()
     move_animal = MoveAnimal.Field()
     transfer_animal = TransferAnimal.Field()
 
