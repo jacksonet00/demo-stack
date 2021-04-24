@@ -18,7 +18,6 @@ class RefreshResponse(graphene.ObjectType):
 
 class AnimalInput(graphene.InputObjectType):
     name = graphene.String(required=True)
-    owner_id = graphene.Int(required=True)
     zoo_id = graphene.Int()
 
 
