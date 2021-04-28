@@ -1,7 +1,8 @@
 from datetime import (datetime, timedelta)
 import jwt
+import os
 
-key = 'asdfasdfasdfasdf'
+key = os.environ.get('JWT_SECRET_KEY', 'asdfasdfasdfasdf')
 
 
 def create_access_token(identity):
