@@ -1,41 +1,22 @@
 import graphene
-from .types import FieldError, UserInput, RefreshResponse, AnimalInput, ZooInput, DeleteResponse
-from flask_graphql_auth import mutation_header_jwt_refresh_token_required, mutation_header_jwt_required, create_access_token, create_refresh_token, get_jwt_identity, get_raw_jwt
 from passlib.hash import pbkdf2_sha256
-from .engine import db_session
-from .model import Animal as AnimalModel, Zoo as ZooModel, User as UserModel
-from promise import Promise
-from promise.dataloader import DataLoader
 from graphene_file_upload.scalars import Upload
-import os
-import json
-from google.cloud import storage
-
-# Exception format 'field|message'
-
-
-def upload_to_gcloud():
-    pass
-
-
-def get_path(filename, owner_id, type_='IMG'):
-    TYPES = ['IMG']
-
-    if type_ not in TYPES:
-        raise Exception('type|unknown type')
-
-    if type_ == 'IMG':
-        file = filename.split('.')
-        owner = db_session.query(UserModel).filter(
-            UserModel.id == owner_id).first()
-        if not owner:
-            raise Exception('owner_id|user does not exist')
-        return os.path.join('images', f'{owner.username}', f'{file[0]}.{file[-1]}')
+from .types import (FieldError, UserInput, RefreshResponse,
+                    AnimalInput, ZooInput, DeleteResponse)
+from .engine import db_session
+from .model import (Animal as AnimalModel, Zoo as ZooModel, User as UserModel)
+from .cloud import (upload_to_gcloud, get_path)
+from .auth import create_access_token, create_refresh_token, get_identity, is_auth
 
 
 class FileUpload(graphene.ObjectType):
     url = graphene.String()
     owner_id = graphene.Int()
+    owner = graphene.Field(lambda: User)
+
+    @staticmethod
+    def resolve_owner(parent, info):
+        return db_session.query(UserModel).filter(UserModel.id == parent.owner_id).first()
 
 
 class UploadResponse(graphene.ObjectType):
@@ -51,32 +32,27 @@ class UploadMutation(graphene.Mutation):
 
     def mutate(self, info, file, **kwargs):
         res = UploadResponse()
-        # get owner_id from JWT
-        owner_id = 1
-
-        storage_client = storage.Client()
-        bucket = storage_client.bucket('demo-stack-uploads')
-
-        try:
-            url = get_path(file.filename, owner_id=owner_id)
-            blob = bucket.blob(url)
-            blob.upload_from_file(file)
-        except Exception as e:
-            error = str(e).split('|')
-            res.errors.append(FieldError(field=error[0], message=error[1]))
+        owner = db_session.query(UserModel).filter(
+            UserModel.username == get_identity(info)).first()
+        if not owner:
+            res.errors.append(FieldError(field='Authorization Header',
+                              message='User does not exist'))
         if not res.errors:
-            res.fileUpload = FileUpload(
-                url=blob.public_url, owner_id=owner_id)
+            try:
+                path = get_path(file.filename, username=owner.username)
+                try:
+                    # TODO: move bucket name to env var
+                    upload = upload_to_gcloud(
+                        bucket_name='demo-stack-uploads', file=file, file_path=path)
+                    res.fileUpload = FileUpload(
+                        url=upload['url'], owner_id=owner.id)
+                except:
+                    res.errors.append(FieldError(
+                        field='file', message='upload failed'))
+            except Exception as e:
+                error = str(e).split('|')
+                res.errors.append(FieldError(field=error[0], message=error[1]))
         return res
-
-
-def handle_authorization_error(func):
-    def inner_function(*args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except:
-            return AuthResponse(errors=[FieldError(field='Authorization Header', message='invalid token')])
-    return inner_function
 
 
 class Animal(graphene.ObjectType):
@@ -127,8 +103,14 @@ class User(graphene.ObjectType):
     username = graphene.String()
     zoos = graphene.List(Zoo)
     animals = graphene.List(Animal)
+    profile_photo = graphene.String(required=False)
     created_at = graphene.DateTime()
     updated_at = graphene.DateTime()
+
+
+class UserResponse(graphene.ObjectType):
+    user = graphene.Field(User, default_value=None)
+    errors = graphene.List(FieldError, default_value=[])
 
 
 class AuthResponse(graphene.ObjectType):
@@ -145,21 +127,23 @@ class CreateAnimal(graphene.Mutation):
     Output = AnimalResponse
 
     @staticmethod
-    @handle_authorization_error
-    @mutation_header_jwt_required
     def mutate(root, info, input):
-        res = AnimalResponse()
+        if not is_auth(info):
+            return AnimalResponse(errors=[FieldError(
+                field='headers[Authorization]', message='invalid access token')])
+
+        res = AnimalResponse(errors=[])
+
         owner = db_session.query(UserModel).filter(
-            UserModel.username == get_jwt_identity()).first()
-        if not owner:
-            res.errors.append(FieldError(
-                field='Authorization', message='user does not exist'))
+            UserModel.username == get_identity(info)).first()
+
         if input.zoo_id:
             zoo = db_session.query(ZooModel).filter(
-                ZooModel.id == input.zoo_id)
+                ZooModel.id == input.zoo_id).first()
             if not zoo:
                 res.errors.append(FieldError(
-                    field='zoo_id', message='zoo does not exist'))
+                    field='zooId', message='zoo does not exist'))
+
         if not res.errors:
             animal = AnimalModel(name=input.name, owner_id=owner.id)
             if input.zoo_id:
@@ -167,6 +151,7 @@ class CreateAnimal(graphene.Mutation):
             db_session.add(animal)
             db_session.commit()
             res.animal = animal
+
         return res
 
 
@@ -178,10 +163,11 @@ class UpdateAnimal(graphene.Mutation):
     Output = AnimalResponse
 
     @staticmethod
-    @handle_authorization_error
-    @mutation_header_jwt_required
     def mutate(root, info, id, name=None):
-        res = AnimalResponse()
+        if not is_auth(info):
+            return AnimalResponse(errors=[FieldError(
+                field='headers[Authorization]', message='invalid access token')])
+        res = AnimalResponse(errors=[])
         animal = db_session.query(AnimalModel).filter(
             AnimalModel.id == id).first()
         if not animal:
@@ -201,10 +187,11 @@ class DeleteAnimal(graphene.Mutation):
     Output = DeleteResponse
 
     @ staticmethod
-    @handle_authorization_error
-    @ mutation_header_jwt_required
     def mutate(root, info, id):
-        res = DeleteResponse()
+        if not is_auth(info):
+            return DeleteResponse(errors=[FieldError(
+                field='headers[Authorization]', message='invalid access token')])
+        res = DeleteResponse(errors=[])
         animal = db_session.query(AnimalModel).filter(
             AnimalModel.id == id).first()
         if not animal:
@@ -228,10 +215,11 @@ class MoveAnimal(graphene.Mutation):
     Output = AnimalResponse
 
     @staticmethod
-    @handle_authorization_error
-    @mutation_header_jwt_required
     def mutate(root, info, animal_id, zoo_id):
-        res = AnimalResponse()
+        if not is_auth(info):
+            return AnimalResponse(errors=[FieldError(
+                field='headers[Authorization]', message='invalid access token')])
+        res = AnimalResponse(errors=[])
         animal = db_session.query(AnimalModel).filter(
             AnimalModel.id == animal_id).first()
         zoo = db_session.query(ZooModel).filter(ZooModel.id == zoo_id).first()
@@ -256,10 +244,11 @@ class TransferAnimal(graphene.Mutation):
     Output = AnimalResponse
 
     @staticmethod
-    @handle_authorization_error
-    @mutation_header_jwt_required
     def mutate(root, info, animal_id, user_id):
-        res = AnimalResponse()
+        if not is_auth(info):
+            return AnimalResponse(errors=[FieldError(
+                field='headers[Authorization]', message='invalid access token')])
+        res = AnimalResponse(errors=[])
         animal = db_session.query(AnimalModel).filter(
             AnimalModel.id == animal_id).first()
         user = db_session.query(UserModel).filter(
@@ -284,10 +273,11 @@ class CreateZoo(graphene.Mutation):
     Output = ZooResponse
 
     @staticmethod
-    @handle_authorization_error
-    @mutation_header_jwt_required
     def mutate(root, info, input):
-        res = ZooResponse()
+        if not is_auth(info):
+            return ZooResponse(errors=[FieldError(
+                field='headers[Authorization]', message='invalid access token')])
+        res = ZooResponse(errors=[])
         owner = db_session.query(UserModel).filter(
             UserModel.id == input.owner_id).first()
         if not owner:
@@ -309,10 +299,11 @@ class UpdateZoo(graphene.Mutation):
     Output = ZooResponse
 
     @staticmethod
-    @handle_authorization_error
-    @mutation_header_jwt_required
     def mutate(root, info, id, name=None):
-        res = ZooResponse()
+        if not is_auth(info):
+            return ZooResponse(errors=[FieldError(
+                field='headers[Authorization]', message='invalid access token')])
+        res = ZooResponse(errors=[])
         zoo = db_session.query(ZooModel).filter(
             ZooModel.id == id).first()
         if not zoo:
@@ -332,10 +323,11 @@ class DeleteZoo(graphene.Mutation):
     Output = DeleteResponse
 
     @ staticmethod
-    @handle_authorization_error
-    @ mutation_header_jwt_required
     def mutate(root, info, id):
-        res = DeleteResponse()
+        if not is_auth(info):
+            return DeleteResponse(errors=[FieldError(
+                field='headers[Authorization]', message='invalid access token')])
+        res = DeleteResponse(errors=[])
         zoo = db_session.query(ZooModel).filter(
             ZooModel.id == id).first()
         if not zoo:
@@ -359,10 +351,11 @@ class TransferZoo(graphene.Mutation):
     Output = ZooResponse
 
     @staticmethod
-    @handle_authorization_error
-    @mutation_header_jwt_required
     def mutate(root, info, zoo_id, user_id):
-        res = ZooResponse()
+        if not is_auth(info):
+            return ZooResponse(errors=[FieldError(
+                field='headers[Authorization]', message='invalid access token')])
+        res = ZooResponse(errors=[])
         zoo = db_session.query(ZooModel).filter(
             ZooModel.id == zoo_id).first()
         user = db_session.query(UserModel).filter(
@@ -434,26 +427,58 @@ class Login(graphene.Mutation):
                 field='password', message='incorrect'))
         if not res.errors:
             res.user = user
-            res.access_token = create_access_token(identity=username)
-            res.refresh_token = create_refresh_token(identity=username)
+            res.access_token = create_access_token(username)
+            res.refresh_token = create_refresh_token(username)
         return res
 
 
 class RefreshMutation(graphene.Mutation):
     class Arguments:
-        refresh_token = graphene.String()
+        pass
 
     Output = RefreshResponse
 
     @classmethod
-    @mutation_header_jwt_refresh_token_required
-    def mutate(self, refresh_token):
-        current_user = get_jwt_identity()
-        print(current_user)
+    def mutate(self, info):
+        username = get_identity(info)
         return RefreshResponse(
-            new_access_token=create_access_token(identity=current_user),
-            new_refresh_token=create_refresh_token(identity=current_user)
+            new_access_token=create_access_token(username),
+            new_refresh_token=create_refresh_token(username)
         )
+
+
+class UploadProfilePhoto(graphene.Mutation):
+    class Arguments:
+        photo = Upload(required=True)
+
+    Output = UserResponse
+
+    def mutate(self, info, photo, **kwargs):
+        if not is_auth(info):
+            return UserResponse(errors=[FieldError(field='headers[Authorization]', message='invalid token')])
+
+        res = UserResponse(errors=[])
+
+        user = db_session.query(UserModel).filter(
+            UserModel.username == get_identity(info)).first()
+
+        if not res.errors:
+            try:
+                path = get_path(photo.filename, username=user.username)
+                try:
+                    upload = upload_to_gcloud(
+                        bucket_name='demo-stack-uploads', file=photo, file_path=path)
+                    user.profile_photo = upload['url']
+                    db_session.commit()
+                    res.user = user
+                except:
+                    res.errors.append(FieldError(
+                        field='photo', message='upload failed'))
+            except Exception as e:
+                error = str(e).split('|')
+                res.errors.append(FieldError(field=error[0], message=error[1]))
+
+        return res
 
 
 class Query(graphene.ObjectType):
@@ -486,6 +511,7 @@ class Mutation(graphene.ObjectType):
     login = Login.Field()
     register = Register.Field()
     refresh = RefreshMutation.Field()
+    upload_profile_photo = UploadProfilePhoto.Field()
 
     create_zoo = CreateZoo.Field()
     update_zoo = UpdateZoo.Field()
