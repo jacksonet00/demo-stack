@@ -142,3 +142,17 @@ Hosted at: https://demo-stack.herokuapp.com/graphql
 ### Log
 
 - Currently I've implemented the graphene-file-upload library and I have a local images folder which I can push files to through graphql. Next step is to clean up this system a bit and then switch out the local folder for a GCP bucket.
+
+- Now I have a system setup where you can upload a file and it will be saved to Google Cloud. I'm going to work on making this a bit more robust and also on learning more about GCP.
+
+- The auth system is causing some annoying issues. Having this in a wrapper rather than a function, or some middleware is not ideal. I'm going to look into swapping out the auth for a different solution. I'm also going to add a Me query and rework all the resolvers to use the new auth system and infer user_id from the JWT.
+
+- I implemented my own auth system. It's a lot cleaner and easier to manage than flask-graphql-auth, I'm going to rip that one out.
+
+- I implemented profile photos for users. I think I'm good to move on from file uploads now, I'm saving the stretch goal since it has a monthly cost associated with it.
+
+## Add Pagination
+
+- No idea how to do this atm. I'm going to watch a video of someone implementing it in Typescript and see if I can figure it out in Python on my own.
+
+### Log
