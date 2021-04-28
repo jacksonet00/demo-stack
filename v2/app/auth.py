@@ -4,12 +4,12 @@ import jwt
 key = 'asdfasdfasdfasdf'
 
 
-def cat(identity):
+def create_access_token(identity):
     exp_date = datetime.utcnow() + timedelta(minutes=15)
     return jwt.encode({'payload': identity, 'exp': exp_date}, key, algorithm='HS256')
 
 
-def crt(identity):
+def create_refresh_token(identity):
     exp_date = datetime.utcnow() + timedelta(days=30)
     return jwt.encode({'payload': identity, "exp": exp_date}, key, algorithm='HS256')
 
