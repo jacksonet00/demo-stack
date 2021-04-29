@@ -1,11 +1,11 @@
 import os
 from flask import Flask, redirect
-# from flask_graphql import GraphQLView
 from graphene_file_upload.flask import FileUploadGraphQLView
 from .schema import Schema
 from .engine import engine, Base
 import json
 from .db import gen_data, drop_tables
+from .auth import AuthorizationMiddleware
 
 
 def create_app():
@@ -31,6 +31,7 @@ def create_app():
             'graphql',
             schema=Schema,
             graphiql=True,
+            middleware=[AuthorizationMiddleware()]
         )
     )
 
