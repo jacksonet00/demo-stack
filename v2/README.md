@@ -2,7 +2,7 @@
 
 ## Goal
 
-(1) Build a GraphQL API in Python. (2) Privatize the API. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Add pagination. (8) Add dataloader. (9) Scale via Kubernetes. (10) Scale via serverless. (11) Add documentation. (12) Rate limiting. (13) DDoS protection. (14) Add tests.
+(1) Build a GraphQL API in Python. (2) Privatize the API. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Add pagination. (8) Add dataloader. (9) Add session management with Redis. (10) Scale via Kubernetes. (12) Scale via serverless. (13) Add documentation. (12) Rate limiting. (14) DDoS protection. (15) Add tests.
 
 Hosted at: https://demo-stack.herokuapp.com/graphql
 
@@ -153,6 +153,12 @@ Hosted at: https://demo-stack.herokuapp.com/graphql
 
 ## Add Pagination
 
-- No idea how to do this atm. I'm going to watch a video of someone implementing it in Typescript and see if I can figure it out in Python on my own.
+- Modify fetch queries to select with a limit
+- Modify fetch queries to order by created_at
+- Use cursor to filter by less than created_at
 
 ### Log
+
+- No idea how to do this atm. I'm going to watch a video of someone implementing it in Typescript and see if I can figure it out in Python on my own.
+
+- So I am adding cursor-based pagination to the fetch queries. You will pass a limit and a cursor where the limit is the number of items you want to fetch and cursor is the created_at date you want to fetch from where the items are sorted by newest.
