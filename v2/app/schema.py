@@ -1,11 +1,7 @@
 import graphene
 from .types import (Zoo, Animal, User)
-from .resolvers.animal import (animal, all_animals,
-                               CreateAnimal, UpdateAnimal, DeleteAnimal, TransferAnimal, MoveAnimal)
-from .resolvers.zoo import (
-    all_zoos, zoo, CreateZoo, UpdateZoo, DeleteZoo, TransferZoo)
-from .resolvers.user import (
-    Register, RefreshMutation, Login, UploadProfilePhoto)
+from .resolvers import (animal, all_animals, CreateAnimal, UpdateAnimal, DeleteAnimal, TransferAnimal, MoveAnimal,
+                        all_zoos, zoo, CreateZoo, UpdateZoo, DeleteZoo, TransferZoo, Register, RefreshMutation, Login, UploadProfilePhoto)
 
 
 class Query(graphene.ObjectType):
