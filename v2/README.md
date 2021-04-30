@@ -173,3 +173,5 @@ Hosted at: https://demo-stack.herokuapp.com/graphql
 - Use as the resolver function for nested objects
 
 ### Log
+
+- Dataloader is now implemented. That was quite easy!

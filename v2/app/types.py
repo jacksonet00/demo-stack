@@ -1,6 +1,7 @@
 import graphene
 from .engine import db_session
-from .model import User as UserModel, Zoo as ZooModel
+from .model import (User as UserModel, Zoo as ZooModel)
+from .util.DataLoader import (user_loader, zoo_loader)
 
 
 class Animal(graphene.ObjectType):
@@ -13,13 +14,13 @@ class Animal(graphene.ObjectType):
     created_at = graphene.DateTime()
     updated_at = graphene.DateTime()
 
-    @staticmethod
+    @ staticmethod
     def resolve_owner(parent, info):
-        return db_session.query(UserModel).filter(UserModel.id == parent.owner_id).first()
+        return user_loader.load(parent.owner_id)
 
-    @staticmethod
+    @ staticmethod
     def resolve_zoo(parent, info):
-        return db_session.query(ZooModel).filter(ZooModel.id == parent.zoo_id).first()
+        return zoo_loader.load(parent.zoo_id)
 
 
 class Zoo(graphene.ObjectType):
@@ -31,9 +32,9 @@ class Zoo(graphene.ObjectType):
     created_at = graphene.DateTime()
     updated_at = graphene.DateTime()
 
-    @staticmethod
+    @ staticmethod
     def resolve_owner(parent, info):
-        return db_session.query(UserModel).filter(UserModel.id == parent.owner_id).first()
+        return user_loader.load(parent.owner_id)
 
 
 class User(graphene.ObjectType):
