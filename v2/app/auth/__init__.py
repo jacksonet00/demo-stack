@@ -1,7 +1,7 @@
 from datetime import (datetime, timedelta)
 import jwt
 import os
-from .constants import PROTECTED_QUERIES
+from ..constants import PROTECTED_QUERIES
 
 key = os.environ.get('JWT_SECRET_KEY', 'asdfasdfasdfasdf')
 
