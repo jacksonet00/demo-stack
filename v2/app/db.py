@@ -17,24 +17,24 @@ def drop_tables(tablenames=[]):
 
 def gen_data():
     db_session.add(
-        User(username='jackson', password=pbkdf2_sha256.hash('password')))
+        User(username='jAckson', password=pbkdf2_sha256.hash('password')))
     db_session.add(
         User(username='john', password=pbkdf2_sha256.hash('password')))
     db_session.add(
         User(username='jimothy', password=pbkdf2_sha256.hash('password')))
     db_session.commit()
 
-    john = db_session.query(User).filter(User.username == 'john').first()
-    jackson = db_session.query(User).filter(User.username == 'jackson').first()
+    john = User.query.filter(User.username == 'john').first()
+    jackson = User.query.filter(User.username == 'jackson').first()
 
     db_session.add(Zoo(name='manhattan zoo', owner_id=john.id))
     db_session.add(Zoo(name='san diego zoo', owner_id=john.id))
     db_session.add(Zoo(name='gulf breeze zoo', owner_id=jackson.id))
     db_session.commit()
 
-    manhattan = db_session.query(Zoo).filter(
+    manhattan = Zoo.query.filter(
         Zoo.name == 'manhattan zoo').first()
-    san_deigo = db_session.query(Zoo).filter(
+    san_deigo = Zoo.query.filter(
         Zoo.name == 'san diego zoo').first()
 
     db_session.add(Animal(name='flying squirrel',

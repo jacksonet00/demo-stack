@@ -8,7 +8,7 @@ from datetime import datetime
 
 def all_animals(limit, cursor):
     real_limit = min(50, limit)
-    q = db_session.query(AnimalModel)
+    q = AnimalModel.query
 
     if cursor:
         real_cursor = datetime.strptime(cursor, '%Y-%m-%d %H:%M:%S')
@@ -19,7 +19,7 @@ def all_animals(limit, cursor):
 
 
 def animal(id):
-    return db_session.query(AnimalModel).filter(AnimalModel.id == id).first()
+    return AnimalModel.query.filter(AnimalModel.id == id).first()
 
 
 class CreateAnimal(graphene.Mutation):
@@ -36,11 +36,11 @@ class CreateAnimal(graphene.Mutation):
 
         res = AnimalResponse(errors=[])
 
-        owner = db_session.query(UserModel).filter(
+        owner = UserModel.query.filter(
             UserModel.username == get_identity(info)).first()
 
         if input.zoo_id:
-            zoo = db_session.query(ZooModel).filter(
+            zoo = ZooModel.query.filter(
                 ZooModel.id == input.zoo_id).first()
             if not zoo:
                 res.errors.append(FieldError(
@@ -70,7 +70,7 @@ class UpdateAnimal(graphene.Mutation):
             return AnimalResponse(errors=[FieldError(
                 field='headers[Authorization]', message='invalid access token')])
         res = AnimalResponse(errors=[])
-        animal = db_session.query(AnimalModel).filter(
+        animal = AnimalModel.query.filter(
             AnimalModel.id == id).first()
         if not animal:
             res.errors.append(FieldError(
@@ -94,7 +94,7 @@ class DeleteAnimal(graphene.Mutation):
             return DeleteResponse(errors=[FieldError(
                 field='headers[Authorization]', message='invalid access token')])
         res = DeleteResponse(errors=[])
-        animal = db_session.query(AnimalModel).filter(
+        animal = AnimalModel.query.filter(
             AnimalModel.id == id).first()
         if not animal:
             res.errors.append(FieldError(
@@ -122,9 +122,9 @@ class MoveAnimal(graphene.Mutation):
             return AnimalResponse(errors=[FieldError(
                 field='headers[Authorization]', message='invalid access token')])
         res = AnimalResponse(errors=[])
-        animal = db_session.query(AnimalModel).filter(
+        animal = AnimalModel.query.filter(
             AnimalModel.id == animal_id).first()
-        zoo = db_session.query(ZooModel).filter(ZooModel.id == zoo_id).first()
+        zoo = ZooModel.query.filter(ZooModel.id == zoo_id).first()
         if not animal:
             res.errors.append(FieldError(field='animal_id',
                               message='animal does not exist'))
@@ -151,9 +151,9 @@ class TransferAnimal(graphene.Mutation):
             return AnimalResponse(errors=[FieldError(
                 field='headers[Authorization]', message='invalid access token')])
         res = AnimalResponse(errors=[])
-        animal = db_session.query(AnimalModel).filter(
+        animal = AnimalModel.query.filter(
             AnimalModel.id == animal_id).first()
-        user = db_session.query(UserModel).filter(
+        user = UserModel.query.filter(
             UserModel.id == user_id).first()
         if not animal:
             res.errors.append(FieldError(field='animal_id',

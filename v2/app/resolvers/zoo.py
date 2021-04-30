@@ -8,7 +8,7 @@ from datetime import datetime
 
 def all_zoos(limit, cursor):
     real_limit = min(50, limit)
-    q = db_session.query(ZooModel)
+    q = ZooModel.query
 
     if cursor:
         real_cursor = datetime.strptime(
@@ -20,7 +20,7 @@ def all_zoos(limit, cursor):
 
 
 def zoo(id):
-    return db_session.query(ZooModel).filter(ZooModel.id == id).first()
+    return ZooModel.query.filter(ZooModel.id == id).first()
 
 
 class CreateZoo(graphene.Mutation):
@@ -35,7 +35,7 @@ class CreateZoo(graphene.Mutation):
             return ZooResponse(errors=[FieldError(
                 field='headers[Authorization]', message='invalid access token')])
         res = ZooResponse(errors=[])
-        owner = db_session.query(UserModel).filter(
+        owner = UserModel.query.filter(
             UserModel.id == input.owner_id).first()
         if not owner:
             res.errors.append(FieldError(
@@ -61,7 +61,7 @@ class UpdateZoo(graphene.Mutation):
             return ZooResponse(errors=[FieldError(
                 field='headers[Authorization]', message='invalid access token')])
         res = ZooResponse(errors=[])
-        zoo = db_session.query(ZooModel).filter(
+        zoo = ZooModel.query.filter(
             ZooModel.id == id).first()
         if not zoo:
             res.errors.append(FieldError(
@@ -85,7 +85,7 @@ class DeleteZoo(graphene.Mutation):
             return DeleteResponse(errors=[FieldError(
                 field='headers[Authorization]', message='invalid access token')])
         res = DeleteResponse(errors=[])
-        zoo = db_session.query(ZooModel).filter(
+        zoo = ZooModel.query.filter(
             ZooModel.id == id).first()
         if not zoo:
             res.errors.append(FieldError(
@@ -113,9 +113,9 @@ class TransferZoo(graphene.Mutation):
             return ZooResponse(errors=[FieldError(
                 field='headers[Authorization]', message='invalid access token')])
         res = ZooResponse(errors=[])
-        zoo = db_session.query(ZooModel).filter(
+        zoo = ZooModel.query.filter(
             ZooModel.id == zoo_id).first()
-        user = db_session.query(UserModel).filter(
+        user = UserModel.query.filter(
             UserModel.id == user_id).first()
         if not zoo:
             res.errors.append(FieldError(

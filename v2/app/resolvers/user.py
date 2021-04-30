@@ -20,7 +20,7 @@ class Register(graphene.Mutation):
     def mutate(root, info, input):
         res = AuthResponse()
         username = input.username.lower()
-        user = db_session.query(UserModel).filter(
+        user = UserModel.query.filter(
             UserModel.username == input.username).first()
 
         if user:
@@ -54,7 +54,7 @@ class Login(graphene.Mutation):
     def mutate(root, info, input):
         res = AuthResponse()
         username = input.username.lower()
-        user = db_session.query(UserModel).filter(
+        user = UserModel.query.filter(
             UserModel.username == username).first()
         if not user:
             res.errors.append(FieldError(field='username',
@@ -96,7 +96,7 @@ class UploadProfilePhoto(graphene.Mutation):
 
         res = UserResponse(errors=[])
 
-        user = db_session.query(UserModel).filter(
+        user = UserModel.query.filter(
             UserModel.username == get_identity(info)).first()
 
         if not res.errors:
