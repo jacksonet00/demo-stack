@@ -1,5 +1,6 @@
 import graphene
-from ..types import (ZooInput, ZooResponse, FieldError, DeleteResponse)
+from ..types import (ZooInput, ZooResponse, FieldError,
+                     DeleteResponse, PaginatedZoos)
 from ..engine import db_session
 from ..model import (User as UserModel, Zoo as ZooModel)
 from ..auth import is_auth
@@ -15,8 +16,10 @@ def all_zoos(limit, cursor):
             cursor, '%Y-%m-%d %H:%M:%S')
         q = q.filter(ZooModel.created_at > real_cursor)
 
-    return q.order_by(
-        ZooModel.created_at.desc()).limit(real_limit).all()
+    zoos = q.order_by(
+        ZooModel.created_at.desc()).limit(real_limit + 1).all()
+
+    return PaginatedZoos(zoos=zoos[0:real_limit], has_more=len(zoos) == real_limit + 1)
 
 
 def zoo(id):

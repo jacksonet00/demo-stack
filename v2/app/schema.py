@@ -1,12 +1,12 @@
 import graphene
-from .types import (Zoo, Animal, User)
+from .types import (Zoo, PaginatedZoos, Animal, PaginatedAnimals, User)
 from .resolvers import (animal, all_animals, CreateAnimal, UpdateAnimal, DeleteAnimal, TransferAnimal, MoveAnimal,
                         all_zoos, zoo, CreateZoo, UpdateZoo, DeleteZoo, TransferZoo, Register, RefreshMutation, Login, UploadProfilePhoto)
 
 
 class Query(graphene.ObjectType):
-    all_zoos = graphene.List(Zoo, limit=graphene.Int(),
-                             cursor=graphene.String())
+    all_zoos = graphene.Field(PaginatedZoos, limit=graphene.Int(),
+                              cursor=graphene.String())
 
     @staticmethod
     def resolve_all_zoos(parent, info, limit=50, cursor=None):
@@ -18,8 +18,8 @@ class Query(graphene.ObjectType):
     def resolve_zoo(parent, info, id):
         return zoo(id)
 
-    all_animals = graphene.List(
-        Animal, limit=graphene.Int(), cursor=graphene.String())
+    all_animals = graphene.Field(
+        PaginatedAnimals, limit=graphene.Int(), cursor=graphene.String())
 
     @staticmethod
     def resolve_all_animals(parent, info, limit=50, cursor=None):

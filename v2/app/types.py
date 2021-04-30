@@ -47,6 +47,16 @@ class User(graphene.ObjectType):
     updated_at = graphene.DateTime()
 
 
+class PaginatedAnimals(graphene.ObjectType):
+    animals = graphene.List(Animal)
+    has_more = graphene.Boolean()
+
+
+class PaginatedZoos(graphene.ObjectType):
+    zoos = graphene.List(Zoo)
+    has_more = graphene.Boolean()
+
+
 class FieldError(graphene.ObjectType):
     field = graphene.String()
     message = graphene.String()

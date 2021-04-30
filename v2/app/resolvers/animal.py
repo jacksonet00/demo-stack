@@ -1,7 +1,8 @@
 import graphene
 from ..engine import db_session
 from ..model import (User as UserModel, Zoo as ZooModel, Animal as AnimalModel)
-from ..types import (AnimalInput, AnimalResponse, FieldError, DeleteResponse)
+from ..types import (AnimalInput, AnimalResponse,
+                     FieldError, DeleteResponse, PaginatedAnimals)
 from ..auth import (is_auth, get_identity)
 from datetime import datetime
 
@@ -14,8 +15,10 @@ def all_animals(limit, cursor):
         real_cursor = datetime.strptime(cursor, '%Y-%m-%d %H:%M:%S')
         q = q.filter(AnimalModel.created_at < real_cursor)
 
-    return q.order_by(
-        AnimalModel.created_at.desc()).limit(real_limit).all()
+    animals = q.order_by(
+        AnimalModel.created_at.desc()).limit(real_limit + 1).all()
+
+    return PaginatedAnimals(animals=animals[0:real_limit], has_more=len(animals) == real_limit + 1)
 
 
 def animal(id):
@@ -28,7 +31,7 @@ class CreateAnimal(graphene.Mutation):
 
     Output = AnimalResponse
 
-    @staticmethod
+    @ staticmethod
     def mutate(root, info, input):
         if not is_auth(info):
             return AnimalResponse(errors=[FieldError(
@@ -64,7 +67,7 @@ class UpdateAnimal(graphene.Mutation):
 
     Output = AnimalResponse
 
-    @staticmethod
+    @ staticmethod
     def mutate(root, info, id, name=None):
         if not is_auth(info):
             return AnimalResponse(errors=[FieldError(
@@ -116,7 +119,7 @@ class MoveAnimal(graphene.Mutation):
 
     Output = AnimalResponse
 
-    @staticmethod
+    @ staticmethod
     def mutate(root, info, animal_id, zoo_id):
         if not is_auth(info):
             return AnimalResponse(errors=[FieldError(
@@ -145,7 +148,7 @@ class TransferAnimal(graphene.Mutation):
 
     Output = AnimalResponse
 
-    @staticmethod
+    @ staticmethod
     def mutate(root, info, animal_id, user_id):
         if not is_auth(info):
             return AnimalResponse(errors=[FieldError(
