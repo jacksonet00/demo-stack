@@ -17,8 +17,3 @@ class ZooLoader(DataLoader):
         zoos = {zoo.id: zoo for zoo in ZooModel.query.filter(
             ZooModel.id.in_(keys)).all()}
         return Promise.resolve([zoos.get(key) for key in keys])
-
-
-user_loader = UserLoader()
-
-zoo_loader = ZooLoader()

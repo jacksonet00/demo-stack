@@ -1,7 +1,7 @@
 import graphene
 from .engine import db_session
 from .model import (User as UserModel, Zoo as ZooModel)
-from .util.DataLoader import (user_loader, zoo_loader)
+from .util import (user_loader, zoo_loader)
 
 
 class Animal(graphene.ObjectType):
