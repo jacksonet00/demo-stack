@@ -2,7 +2,7 @@
 
 ## Goal
 
-(1) Build a GraphQL API in Python. (2) Privatize the API. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Add pagination. (8) Add dataloader. (9) Add session management with Redis. (10) Scale via Kubernetes. (12) Scale via serverless. (13) Add documentation. (12) Rate limiting. (14) DDoS protection. (15) Add tests.
+(1) Build a GraphQL API in Python. (2) Privatize the API. (3) Containerize the server and database using Docker. (4) Deploy the app to Heroku. (5) Add relations to the data model. (6) Handle image uploads. (7) Add pagination. (8) Add dataloader. (9) Add session management with Redis. (10) Rate limiting. (11) DDoS protection. (12) Tests
 
 Hosted at: https://demo-stack.herokuapp.com/graphql
 
@@ -175,3 +175,12 @@ Hosted at: https://demo-stack.herokuapp.com/graphql
 ### Log
 
 - Dataloader is now implemented. That was quite easy!
+
+## Session Management
+
+- Redis
+- JWT
+
+### Log
+
+- I have been thinking about this for a couple weeks now and I still don't fully conceptualize auth + sessions + cookies + jwts.
