@@ -3,10 +3,20 @@ from ..types import (ZooInput, ZooResponse, FieldError, DeleteResponse)
 from ..engine import db_session
 from ..model import (User as UserModel, Zoo as ZooModel)
 from ..auth import is_auth
+from datetime import datetime
 
 
-def all_zoos():
-    return db_session.query(ZooModel).all()
+def all_zoos(limit, cursor):
+    real_limit = min(50, limit)
+    q = db_session.query(ZooModel)
+
+    if cursor:
+        real_cursor = datetime.strptime(
+            cursor, '%Y-%m-%d %H:%M:%S')
+        q = q.filter(ZooModel.created_at > real_cursor)
+
+    return q.order_by(
+        ZooModel.created_at.desc()).limit(real_limit).all()
 
 
 def zoo(id):

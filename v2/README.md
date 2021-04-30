@@ -162,3 +162,14 @@ Hosted at: https://demo-stack.herokuapp.com/graphql
 - No idea how to do this atm. I'm going to watch a video of someone implementing it in Typescript and see if I can figure it out in Python on my own.
 
 - So I am adding cursor-based pagination to the fetch queries. You will pass a limit and a cursor where the limit is the number of items you want to fetch and cursor is the created_at date you want to fetch from where the items are sorted by newest.
+
+- For now I'm not going to refactor into the Graphene-SQLAlchemy library with the SQLAlchemyObjectType. I'm not a fan of the API for it and it has some limitations as I understand it currently. If I find a way to bypass these limitations, then I'll reconsider implementing. Maybe using some abstraction snippets I found online that make the API a bit cleaner. IMO it isn't worth it to add an abstraction if it won't actually benefit the cleanliness and flexibility of your code.
+
+- Completed cursor based pagination. Implemented it on allAnimals and allZoos.
+
+## Add Dataloader
+
+- Extend dataloader class from promise library
+- Use as the resolver function for nested objects
+
+### Log

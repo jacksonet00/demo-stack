@@ -3,10 +3,19 @@ from ..engine import db_session
 from ..model import (User as UserModel, Zoo as ZooModel, Animal as AnimalModel)
 from ..types import (AnimalInput, AnimalResponse, FieldError, DeleteResponse)
 from ..auth import (is_auth, get_identity)
+from datetime import datetime
 
 
-def all_animals():
-    return db_session.query(AnimalModel).all()
+def all_animals(limit, cursor):
+    real_limit = min(50, limit)
+    q = db_session.query(AnimalModel)
+
+    if cursor:
+        real_cursor = datetime.strptime(cursor, '%Y-%m-%d %H:%M:%S')
+        q = q.filter(AnimalModel.created_at < real_cursor)
+
+    return q.order_by(
+        AnimalModel.created_at.desc()).limit(real_limit).all()
 
 
 def animal(id):

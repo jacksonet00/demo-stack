@@ -9,25 +9,27 @@ from .resolvers.user import (
 
 
 class Query(graphene.ObjectType):
-    all_zoos = graphene.List(Zoo)
+    all_zoos = graphene.List(Zoo, limit=graphene.Int(),
+                             cursor=graphene.String())
 
     @staticmethod
-    def resolve_all_zoos(parent, info):
-        return all_zoos()
+    def resolve_all_zoos(parent, info, limit=50, cursor=None):
+        return all_zoos(limit, cursor)
 
-    zoo = graphene.Field(Zoo)
+    zoo = graphene.Field(Zoo, id=graphene.Int(required=True))
 
     @staticmethod
     def resolve_zoo(parent, info, id):
         return zoo(id)
 
-    all_animals = graphene.List(Animal)
+    all_animals = graphene.List(
+        Animal, limit=graphene.Int(), cursor=graphene.String())
 
     @staticmethod
-    def resolve_all_animals(parent, info):
-        return all_animals()
+    def resolve_all_animals(parent, info, limit=50, cursor=None):
+        return all_animals(limit, cursor)
 
-    animal = graphene.Field(Animal)
+    animal = graphene.Field(Animal, id=graphene.Int(required=True))
 
     @staticmethod
     def resolve_animal(parent, info, id):
