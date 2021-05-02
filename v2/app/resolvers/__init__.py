@@ -3,4 +3,4 @@ from .animal import (animal, all_animals,
 from .zoo import (
     all_zoos, zoo, CreateZoo, UpdateZoo, DeleteZoo, TransferZoo)
 from .user import (
-    Register, RefreshMutation, Login, UploadProfilePhoto)
+    me, Register, RefreshMutation, Login, UploadProfilePhoto)

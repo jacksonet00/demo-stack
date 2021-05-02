@@ -10,6 +10,17 @@ from ..auth import (create_access_token,
 from ..cloud import (get_path, upload_to_gcloud)
 
 
+def me(info):
+    if not is_auth(info):
+        return UserResponse(errors=[FieldError(field='headers[Authorization]', message='invalid access token')])
+    res = UserResponse(errors=[])
+    if not res.errors:
+        user = UserModel.query.filter(
+            UserModel.username == get_identity(info)).first()
+        res.user = user
+    return res
+
+
 class Register(graphene.Mutation):
     class Arguments:
         input = UserInput(required=True)

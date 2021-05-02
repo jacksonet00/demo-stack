@@ -1,7 +1,8 @@
 import graphene
-from .types import (Zoo, PaginatedZoos, Animal, PaginatedAnimals, User)
+from .types import (Zoo, PaginatedZoos, Animal,
+                    PaginatedAnimals, User, UserResponse)
 from .resolvers import (animal, all_animals, CreateAnimal, UpdateAnimal, DeleteAnimal, TransferAnimal, MoveAnimal,
-                        all_zoos, zoo, CreateZoo, UpdateZoo, DeleteZoo, TransferZoo, Register, RefreshMutation, Login, UploadProfilePhoto)
+                        all_zoos, zoo, CreateZoo, UpdateZoo, DeleteZoo, TransferZoo, me, Register, RefreshMutation, Login, UploadProfilePhoto,)
 
 
 class Query(graphene.ObjectType):
@@ -30,6 +31,12 @@ class Query(graphene.ObjectType):
     @staticmethod
     def resolve_animal(parent, info, id):
         return animal(id)
+
+    me = graphene.Field(UserResponse)
+
+    @staticmethod
+    def resolve_me(parent, info):
+        return me(info)
 
 
 class Mutation(graphene.ObjectType):
