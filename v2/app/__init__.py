@@ -8,7 +8,7 @@ from .db import gen_data, drop_tables
 from .auth import AuthorizationMiddleware
 
 
-def create_app():
+def create_app():  # App Factory
     app = Flask(__name__)
     app.debug = os.environ.get('ENV') != '__prod__'
 
