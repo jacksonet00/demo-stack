@@ -96,6 +96,8 @@ class RefreshMutation(graphene.Mutation):
 
 
 class UploadProfilePhoto(graphene.Mutation):
+
+    # TODO: Protect against overuse of storage buckets. Remove old profile photos when new photo is uploaded.
     class Arguments:
         photo = Upload(required=True)
 
@@ -117,8 +119,8 @@ class UploadProfilePhoto(graphene.Mutation):
                     upload = upload_to_gcloud(
                         bucket_name='demo-stack-uploads', file=photo, file_path=path)
                     user.profile_photo = upload['url']
-                    db_session.commit()
                     res.user = user
+                    db_session.commit()
                 except:
                     res.errors.append(FieldError(
                         field='photo', message='upload failed'))

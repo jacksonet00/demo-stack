@@ -16,6 +16,7 @@ class User(Base, BaseModel):
 
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
+    profile_photo = Column(String, unique=True, nullable=True)
     zoos = relationship('Zoo', back_populates='owner')
     animals = relationship('Animal', back_populates='owner')
 
