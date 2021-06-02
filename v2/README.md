@@ -184,3 +184,5 @@ Hosted at: https://demo-stack.herokuapp.com/graphql
 ### Log
 
 - I have been thinking about this for a couple weeks now and I still don't fully conceptualize auth + sessions + cookies + jwts.
+
+- I'm going to have to make changes to the deploy set up in order to intergrate redis, so before getting started with that I'm going to make sure everything currently is deploying correctly so that I'm only changing 1 element at a time.
